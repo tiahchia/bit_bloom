@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BIT BLOOM — Digital Garden</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Nunito:wght@400;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            image-rendering: pixelated;
+        }
+        
+        :root {
+            --sage: #9dc08b;
+            --sage-dark: #7a9e6d;
+            --bloom: #ffb7c5;
+            --bloom-dark: #ff8da8;
+            --sky: #a0d8ef;
+            --sky-dark: #7bb8d8;
+            --sun: #ffd93d;
+            --earth: #d4a574;
+            --void: #2d3436;
+            --cloud: #f8f9fa;
+        }
+        
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--cloud);
+            color: var(--void);
+            overflow-x: hidden;
+        }
+        
+        .font-pixel {
+            font-family: 'Press Start 2P', cursive;
+        }
+        
+        /* 8-Bit Border Effect */
+        .bit-border {
+            position: relative;
+            background: white;
+            box-shadow: 
+                -4px 0 0 0 black,
+                4px 0 0 0 black,
+                0 -4px 0 0 black,
+                0 4px 0 0 black;
+            margin: 4px;
+        }
+        
+        .bit-border::before {
+            content: '';
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            right: -4px;
+            bottom: -4px;
+            background: transparent;
+            box-shadow: 
+                -4px -4px 0 0 black,
+                4px -4px 0 0 black,
+                -4px 4px 0 0 black,
+                4px 4px 0 0 black;
+            pointer-events: none;
+        }
+        
+        /* Pixel Button */
+        .pixel-btn {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.5rem;
+            font-family: 'Nunito', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+            background: var(--sage);
+            color: white;
+            box-shadow: 
+                0 6px 0 var(--sage-dark),
+                0 6px 0 4px black;
+            transform: translateY(-6px);
+            transition: all 0.1s;
+        }
+        
+        .pixel-btn:active {
+            transform: translateY(0);
+            box-shadow: 
+                0 0 0 var(--sage-dark),
+                0 0 0 4px black;
+        }
+        
+        .pixel-btn.bloom {
+            background: var(--bloom);
+            box-shadow: 
+                0 6px 0 var(--bloom-dark),
+                0 6px 0 4px black;
+        }
+        
+        .pixel-btn.bloom:active {
+            box-shadow: 
+                0 0 0 var(--bloom-dark),
+                0 0 0 4px black;
+        }
+        
+        .pixel-btn.sky {
+            background: var(--sky);
+            box-shadow: 
+                0 6px 0 var(--sky-dark),
+                0 6px 0 4px black;
+        }
+        
+        .pixel-btn.sky:active {
+            box-shadow: 
+                0 0 0 var(--sky-dark),
+                0 0 0 4px black;
+        }
+        
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 100;
+            padding: 1rem;
+        }
+        
+        .nav-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 1.5rem;
+            background: white;
+            box-shadow: 
+                0 4px 0 black,
+                0 8px 0 rgba(0,0,0,0.1);
+        }
+        
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        
+        .logo-sprite {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--sage), var(--sky));
+            position: relative;
+            animation: sprite-bounce 0.8s steps(2) infinite;
+        }
+        
+        @keyframes sprite-bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+        
+        .logo-sprite::before {
+            content: '🌱';
+            position: absolute;
+            inset: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+        }
+        
+        .logo-text {
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+        
+        .logo-text span {
+            color: var(--sage);
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .nav-item {
+            padding: 0.75rem 1.25rem;
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-decoration: none;
+            color: var(--void);
+            position: relative;
+            transition: all 0.2s;
+        }
+        
+        .nav-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 4px;
+            background: var(--sage);
+            transition: width 0.2s;
+        }
+        
+        .nav-item:hover {
+            color: var(--sage);
+        }
+        
+        .nav-item:hover::after {
+            width: 80%;
+        }
+        
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 8rem 2rem 4rem;
+            position: relative;
+            background: 
+                linear-gradient(180deg, var(--sky) 0%, var(--cloud) 100%);
+            overflow: hidden;
+        }
+        
+        /* Clouds */
+        .cloud {
+            position: absolute;
+            background: white;
+            border-radius: 100px;
+            opacity: 0.8;
+            animation: cloud-float 20s infinite linear;
+        }
+        
+        .cloud::before,
+        .cloud::after {
+            content: '';
+            position: absolute;
+            background: white;
+            border-radius: 100px;
+        }
+        
+        .cloud-1 {
+            width: 100px;
+            height: 40px;
+            top: 20%;
+            left: -100px;
+        }
+        
+        .cloud-1::before {
+            width: 50px;
+            height: 50px;
+            top: -25px;
+            left: 10px;
+        }
+        
+        .cloud-1::after {
+            width: 60px;
+            height: 40px;
+            top: -15px;
+            right: 10px;
+        }
+        
+        .cloud-2 {
+            width: 80px;
+            height: 35px;
+            top: 40%;
+            left: -80px;
+            animation-delay: -7s;
+        }
+        
+        .cloud-2::before {
+            width: 40px;
+            height: 40px;
+            top: -20px;
+            left: 15px;
+        }
+        
+        .cloud-2::after {
+            width: 50px;
+            height: 35px;
+            top: -10px;
+            right: 15px;
+        }
+        
+        @keyframes cloud-float {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(calc(100vw + 200px)); }
+        }
+        
+        .hero-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .hero-text h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+        }
+        
+        .hero-text h1 .pixel {
+            font-family: 'Press Start 2P', cursive;
+            font-size: 0.6em;
+            color: var(--sage);
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+        
+        .hero-text p {
+            font-size: 1.125rem;
+            color: #5a6a5a;
+            line-height: 1.7;
+            margin-bottom: 2rem;
+        }
+        
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .hero-visual {
+            position: relative;
+            aspect-ratio: 1;
+        }
+        
+        .garden-container {
+            width: 100%;
+            height: 100%;
+            background: 
+                linear-gradient(180deg, var(--sky) 30%, var(--sage) 30%, var(--earth) 70%);
+            border: 4px solid black;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .garden-grid {
+            position: absolute;
+            bottom: 10%;
+            left: 50%;
+            transform: translateX(-50%);
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        
+        .plant-slot {
+            width: 60px;
+            height: 60px;
+            background: var(--earth);
+            border: 3px solid black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .plant-slot:hover {
+            transform: scale(1.1);
+            background: var(--sage);
+        }
+        
+        .sun {
+            position: absolute;
+            top: 10%;
+            right: 10%;
+            width: 60px;
+            height: 60px;
+            background: var(--sun);
+            border: 3px solid black;
+            border-radius: 50%;
+            animation: sun-pulse 3s ease-in-out infinite;
+        }
+        
+        @keyframes sun-pulse {
+            0%, 100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 217, 61, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 0 20px 10px rgba(255, 217, 61, 0.2); }
+        }
+        
+        /* Features */
+        .features {
+            padding: 6rem 2rem;
+            background: white;
+            position: relative;
+        }
+        
+        .features::before {
+            content: '';
+            position: absolute;
+            top: -20px;
+            left: 0;
+            right: 0;
+            height: 40px;
+            background: repeating-linear-gradient(
+                45deg,
+                var(--sage),
+                var(--sage) 20px,
+                var(--cloud) 20px,
+                var(--cloud) 40px
+            );
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+        
+        .section-header h2 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+        }
+        
+        .section-header p {
+            color: #6a7a6a;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .feature-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+        }
+        
+        .feature-card {
+            background: white;
+            border: 4px solid black;
+            padding: 2rem;
+            position: relative;
+            transition: all 0.3s;
+        }
+        
+        .feature-card::before {
+            content: '';
+            position: absolute;
+            top: 8px;
+            left: 8px;
+            right: -8px;
+            bottom: -8px;
+            background: var(--sage);
+            z-index: -1;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .feature-card:hover {
+            transform: translate(-8px, -8px);
+        }
+        
+        .feature-card:hover::before {
+            opacity: 1;
+        }
+        
+        .feature-card:nth-child(2)::before {
+            background: var(--bloom);
+        }
+        
+        .feature-card:nth-child(3)::before {
+            background: var(--sky);
+        }
+        
+        .feature-icon {
+            width: 64px;
+            height: 64px;
+            border: 3px solid black;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            background: white;
+        }
+        
+        .feature-card h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+        }
+        
+        .feature-card p {
+            color: #6a7a6a;
+            line-height: 1.6;
+        }
+        
+        /* Plants Showcase */
+        .showcase {
+            padding: 6rem 2rem;
+            background: var(--sage);
+            position: relative;
+        }
+        
+        .showcase-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+        }
+        
+        .plant-card {
+            aspect-ratio: 3/4;
+            background: white;
+            border: 4px solid black;
+            position: relative;
+            cursor: pointer;
+            overflow: hidden;
+        }
+        
+        .plant-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.6), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .plant-card:hover::after {
+            opacity: 1;
+        }
+        
+        .plant-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: contrast(1.1) saturate(0.8);
+            transition: all 0.3s;
+        }
+        
+        .plant-card:hover img {
+            transform: scale(1.1);
+            filter: contrast(1) saturate(1);
+        }
+        
+        .plant-info {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 1.5rem;
+            color: white;
+            z-index: 1;
+            transform: translateY(100%);
+            transition: transform 0.3s;
+        }
+        
+        .plant-card:hover .plant-info {
+            transform: translateY(0);
+        }
+        
+        .plant-info h4 {
+            font-size: 1.125rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+        
+        .plant-info p {
+            font-size: 0.875rem;
+            opacity: 0.8;
+        }
+        
+        /* CTA */
+        .cta {
+            padding: 6rem 2rem;
+            text-align: center;
+            background: 
+                linear-gradient(135deg, var(--bloom) 0%, var(--sky) 100%);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: 
+                radial-gradient(circle at 20% 50%, white 2px, transparent 2px),
+                radial-gradient(circle at 80% 50%, white 2px, transparent 2px);
+            background-size: 40px 40px;
+            opacity: 0.3;
+        }
+        
+        .cta-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .cta h2 {
+            font-size: clamp(2rem, 5vw, 3rem);
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+        }
+        
+        .cta p {
+            color: #5a4a5a;
+            max-width: 500px;
+            margin: 0 auto 2rem;
+            font-size: 1.125rem;
+        }
+        
+        /* Footer */
+        footer {
+            padding: 4rem 2rem;
+            background: var(--void);
+            color: white;
+        }
+        
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 4rem;
+        }
+        
+        .footer-brand .logo-text {
+            color: white;
+            margin-bottom: 1rem;
+        }
+        
+        .footer-brand p {
+            color: #9a9a9a;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+        
+        .footer-col h4 {
+            font-size: 0.875rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 1.5rem;
+            color: var(--sage);
+        }
+        
+        .footer-col ul {
+            list-style: none;
+        }
+        
+        .footer-col li {
+            margin-bottom: 0.75rem;
+        }
+        
+        .footer-col a {
+            color: #9a9a9a;
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.3s;
+        }
+        
+        .footer-col a:hover {
+            color: white;
+        }
+        
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 4rem auto 0;
+            padding-top: 2rem;
+            border-top: 1px solid #3a4a4a;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.75rem;
+            color: #6a7a7a;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .hero-content {
+                grid-template-columns: 1fr;
+                text-align: center;
+            }
+            
+            .hero-buttons {
+                justify-content: center;
+            }
+            
+            .hero-visual {
+                max-width: 400px;
+                margin: 0 auto;
+            }
+            
+            .showcase-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .footer-inner {
+                grid-template-columns: 1fr 1fr;
+                gap: 2rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .nav-menu {
+                display: none;
+            }
+            
+            .hero-text h1 {
+                font-size: 1.75rem;
+            }
+            
+            .showcase-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-inner {
+                grid-template-columns: 1fr;
+            }
+            
+            .footer-bottom {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+        }
+        
+        /* Floating Petals */
+        .petal {
+            position: fixed;
+            font-size: 1.5rem;
+            pointer-events: none;
+            animation: petal-fall 10s linear forwards;
+            z-index: 50;
+        }
+        
+        @keyframes petal-fall {
+            0% { 
+                transform: translateY(-100vh) rotate(0deg); 
+                opacity: 1;
+            }
+            100% { 
+                transform: translateY(100vh) rotate(360deg); 
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="nav-inner">
+            <div class="logo">
+                <div class="logo-sprite"></div>
+                <span class="logo-text">BIT<span>BLOOM</span></span>
+            </div>
+            <div class="nav-menu">
+                <a href="#features" class="nav-item">Features</a>
+                <a href="#showcase" class="nav-item">Plants</a>
+                <a href="#about" class="nav-item">About</a>
+                <a href="#contact" class="nav-item">Contact</a>
+            </div>
+        </div>
+    </nav>
+    
+    <section class="hero">
+        <div class="cloud cloud-1"></div>
+        <div class="cloud cloud-2"></div>
+        
+        <div class="hero-content">
+            <div class="hero-text">
+                <h1>
+                    <span class="pixel">GROW YOUR</span>
+                    Digital Garden<br>
+                    One Pixel at a Time
+                </h1>
+                <p>Cultivate your own 8-bit paradise. Collect rare plants, design zen gardens, and share your botanical creations with a community of green-thumbed pixel artists.</p>
+                <div class="hero-buttons">
+                    <a href="#showcase" class="pixel-btn">
+                        <span>🌱</span>
+                        Start Gardening
+                    </a>
+                    <a href="#features" class="pixel-btn bloom">
+                        <span>🌸</span>
+                        See Features
+                    </a>
+                </div>
+            </div>
+            
+            <div class="hero-visual">
+                <div class="garden-container">
+                    <div class="sun"></div>
+                    <div class="garden-grid">
+                        <div class="plant-slot" onclick="bloom(this)">🌷</div>
+                        <div class="plant-slot" onclick="bloom(this)">🌻</div>
+                        <div class="plant-slot" onclick="bloom(this)">🌹</div>
+                        <div class="plant-slot" onclick="bloom(this)">🌺</div>
+                        <div class="plant-slot" onclick="bloom(this)">🌵</div>
+                        <div class="plant-slot" onclick="bloom(this)">🌿</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="features" id="features">
+        <div class="section-header">
+            <h2>🌿 Cultivate Your Paradise 🌿</h2>
+            <p>Everything you need to grow, design, and share your perfect digital garden.</p>
+        </div>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🌱</div>
+                <h3>Grow & Nurture</h3>
+                <p>Plant seeds, water daily, and watch your garden bloom. Each plant has unique needs and growth patterns.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎨</div>
+                <h3>Pixel Art Tools</h3>
+                <p>Design custom pots, paths, and decorations. Import your own sprites or use our growing library.</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🤝</div>
+                <h3>Share & Visit</h3>
+                <p>Invite friends to explore your garden. Trade rare cuttings and compete in seasonal events.</p>
+            </div>
+        </div>
+    </section>
+    
+    <section class="showcase" id="showcase">
+        <div class="showcase-grid">
+            <div class="plant-card">
+                <img src="https://images.unsplash.com/photo-1459411552884-841db9b3cc2a?w=400&q=80" alt="Plant 1">
+                <div class="plant-info">
+                    <h4>Pixel Petunia</h4>
+                    <p>Rarity: ★★★☆☆</p>
+                </div>
+            </div>
+            <div class="plant-card">
+                <img src="https://images.unsplash.com/photo-1490750967868-88aa4486c946?w=400&q=80" alt="Plant 2">
+                <div class="plant-info">
+                    <h4>8-Bit Bonsai</h4>
+                    <p>Rarity: ★★★★★</p>
+                </div>
+            </div>
+            <div class="plant-card">
+                <img src="https://images.unsplash.com/photo-1463936575829-25148e1db1b8?w=400&q=80" alt="Plant 3">
+                <div class="plant-info">
+                    <h4>Retro Rose</h4>
+                    <p>Rarity: ★★★★☆</p>
+                </div>
+            </div>
+            <div class="plant-card">
+                <img src="https://images.unsplash.com/photo-1509423350716-97f9360b3e74?w=400&q=80" alt="Plant 4">
+                <div class="plant-info">
+                    <h4>Sprite Succulent</h4>
+                    <p>Rarity: ★★☆☆☆</p>
+                </div>
+            </div>
+        </div>
+    </section>
+    
+    <section class="cta">
+        <div class="cta-content">
+            <h2>Ready to Plant Your First Seed?</h2>
+            <p>Join 50,000+ gardeners already growing their dream pixel gardens. Free to play, with premium plants available.</p>
+            <a href="#" class="pixel-btn sky" style="font-size: 1.125rem; padding: 1.25rem 2rem;">
+                <span>🚀</span>
+                Play Now — It's Free!
+            </a>
+        </div>
+    </section>
+    
+    <footer>
+        <div class="footer-inner">
+            <div class="footer-brand">
+                <div class="logo" style="margin-bottom: 1rem;">
+                    <div class="logo-sprite" style="width: 40px; height: 40px;"></div>
+                    <span class="logo-text" style="color: white;">BIT<span style="color: var(--sage);">BLOOM</span></span>
+                </div>
+                <p>A digital gardening experience that combines the zen of cultivation with the creativity of pixel art. Grow something beautiful.</p>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Game</h4>
+                <ul>
+                    <li><a href="#">Play Now</a></li>
+                    <li><a href="#">Features</a></li>
+                    <li><a href="#">Shop</a></li>
+                    <li><a href="#">Events</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Community</h4>
+                <ul>
+                    <li><a href="#">Discord</a></li>
+                    <li><a href="#">Reddit</a></li>
+                    <li><a href="#">Twitter</a></li>
+                    <li><a href="#">Gallery</a></li>
+                </ul>
+            </div>
+            
+            <div class="footer-col">
+                <h4>Support</h4>
+                <ul>
+                    <li><a href="#">Help Center</a></li>
+                    <li><a href="#">Contact</a></li>
+                    <li><a href="#">Privacy</a></li>
+                    <li><a href="#">Terms</a></li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <span>Made with 🌱 and 💖 in 2026</span>
+            <span>© Bit Bloom Studio</span>
+        </div>
+    </footer>
+    
+    <script>
+        // Plant bloom effect
+        function bloom(slot) {
+            const plants = ['🌷', '🌻', '🌹', '🌺', '🌵', '🌿', '🌼', '🌸', '💐', '🪴'];
+            const current = slot.textContent;
+            let next;
+            do {
+                next = plants[Math.floor(Math.random() * plants.length)];
+            } while (next === current);
+            
+            slot.style.transform = 'scale(0)';
+            setTimeout(() => {
+                slot.textContent = next;
+                slot.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    slot.style.transform = 'scale(1)';
+                }, 200);
+            }, 200);
+            
+            // Create falling petal
+            createPetal();
+        }
+        
+        // Create falling petals
+        function createPetal() {
+            const petals = ['🌸', '🌺', '🌼', '🌷', '🍃'];
+            const petal = document.createElement('div');
+            petal.className = 'petal';
+            petal.textContent = petals[Math.floor(Math.random() * petals.length)];
+            petal.style.left = Math.random() * window.innerWidth + 'px';
+            petal.style.animationDuration = (Math.random() * 5 + 8) + 's';
+            document.body.appendChild(petal);
+            setTimeout(() => petal.remove(), 13000);
+        }
+        
+        // Random petals
+        setInterval(createPetal, 3000);
+        
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
